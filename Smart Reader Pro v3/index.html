@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Smart Reader Pro - ჭკვიანი მკითხველი</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Styles.css">
+</head>
+
+<body>
+    <!-- Floating Settings Button -->
+    <button class="settings-floating-btn" onclick="toggleSettings()" title="პარამეტრები">⚙️</button>
+
+    <!-- ==================== LANDING SCREEN ==================== -->
+    <div id="landing-screen">
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="logo">📖</div>
+                <h1>Smart Reader Pro</h1>
+                <p class="subtitle">თქვენი პირადი ასისტენტი ტექსტების სწრაფად და ეფექტურად წასაკითხად. მოუსმინეთ ნებისმიერ ტექსტს ხმამაღლა, დაზოგეთ დრო და გაზარდეთ პროდუქტიულობა.</p>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎧</div>
+                <div class="feature-title">ხმოვანი კითხვა</div>
+                <div class="feature-desc">ბუნებრივი ხმა ინგლისურ და რუსულ ენებზე</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">პროგრესის ტრეკინგი</div>
+                <div class="feature-desc">თვალი ადევნეთ წაკითხულ ტექსტებს და დახარჯულ დროს</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌙</div>
+                <div class="feature-title">თვალის დაცვა</div>
+                <div class="feature-desc">ღამის რეჟიმი და სეპია თემა კომფორტული კითხვისთვის</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">სწრაფი ნავიგაცია</div>
+                <div class="feature-desc">ადვილად გადაადგილდით პარაგრაფებს შორის</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-grid">
+                <div class="input-section">
+                    <div class="section-header">
+                        <h2 class="section-title">დაიწყეთ კითხვა</h2>
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="loadDemo()">
+                                <span>✨</span>
+                                <span>Demo</span>
+                            </button>
+                            <button class="quick-btn" onclick="pasteFromClipboard()">
+                                <span>📋</span>
+                                <span>ჩასმა</span>
+                            </button>
+                            <button class="quick-btn" onclick="document.getElementById('text-input').value = ''">
+                                <span>🗑️</span>
+                                <span>გასუფთავება</span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="text-input" placeholder="ჩასვით ან აკრიფეთ თქვენი ტექსტი აქ...&#10;&#10;მაგალითად, სტატია, წიგნის თავი, ესე, ან ნებისმიერი სხვა ტექსტი რომლის მოსმენაც გსურთ."></textarea>
+                    <button class="primary-btn" onclick="startReading()">
+                        <span>🎯</span>
+                        <span>დაწყება</span>
+                    </button>
+                </div>
+
+                <div class="sidebar">
+                    <div class="stats-card">
+                        <h3 class="section-title">სტატისტიკა</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-texts">0</div>
+                                <div class="stat-label">ტექსტი</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-time">0</div>
+                                <div class="stat-label">წუთი</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-words">0</div>
+                                <div class="stat-label">სიტყვა</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-sessions">0</div>
+                                <div class="stat-label">სესია</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="saved-texts-card">
+                        <h3 class="section-title">შენახული ტექსტები</h3>
+                        <div id="saved-texts-list">
+                            <div class="empty-state">
+                                <div style="font-size: 48px; margin-bottom: 12px;">📚</div>
+                                <div>ჯერ არ გაქვთ შენახული ტექსტები</div>
+                            </div>
+                        </div>
+                        <div class="view-all-link" onclick="showAllSavedTexts()">
+                            ყველას ნახვა →
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== READER SCREEN ==================== -->
+    <div id="reader-screen">
+        <div class="top-nav">
+            <div class="nav-left">
+                <button class="icon-btn" onclick="exitReader()" title="გასვლა">🏠</button>
+                <button class="icon-btn" onclick="saveCurrentText()" title="შენახვა">💾</button>
+                <button class="icon-btn" onclick="toggleBookmark()" title="სანიშნე" id="bookmark-btn">🔖</button>
+                <button class="icon-btn" onclick="showBookmarksManager()" title="სანიშნეები">📑</button>
+            </div>
+
+            <div class="nav-right">
+                <div id="current-voice-display" class="voice-badge" style="display:none"></div>
+                <div class="control-group">
+                    <span>🎨</span>
+                    <select id="theme-select" onchange="setTheme(this.value)">
+                        <option value="system">სისტემა</option>
+                        <option value="">ღია</option>
+                        <option value="dark">ბნელი</option>
+                        <option value="sepia">სეპია</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <span>📏</span>
+                    <select onchange="setFontSize(this.value + 'px')">
+                        <option value="20">20px</option>
+                        <option value="24">24px</option>
+                        <option value="28" selected>28px</option>
+                        <option value="32">32px</option>
+                        <option value="36">36px</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <span>🗣️</span>
+                    <select id="voice-select" onchange="updateVoicePreference()"></select>
+                </div>
+                <div class="control-group speed-control">
+                    <span>⚡</span>
+                    <div class="speed-buttons">
+                        <button class="speed-btn" data-speed="0.75" onclick="setSpeed(0.75)">0.75x</button>
+                        <button class="speed-btn active" data-speed="1" onclick="setSpeed(1)">1x</button>
+                        <button class="speed-btn" data-speed="1.25" onclick="setSpeed(1.25)">1.25x</button>
+                        <button class="speed-btn" data-speed="1.5" onclick="setSpeed(1.5)">1.5x</button>
+                        <button class="speed-btn" data-speed="1.75" onclick="setSpeed(1.75)">1.75x</button>
+                        <button class="speed-btn" data-speed="2" onclick="setSpeed(2)">2x</button>
+                    </div>
+                    <input type="hidden" id="rate-range" value="1">
+                </div>
+                <div class="control-group">
+                    <span>🔊</span>
+                    <input type="range" id="volume-range" min="0" max="1" step="0.1" value="1"
+                        oninput="updateVolumeVal(this.value)">
+                    <span id="volume-val">100</span>%
+                </div>
+                <div class="control-group">
+                    <span>🎵</span>
+                    <input type="range" id="pitch-range" min="0.5" max="2" step="0.1" value="1"
+                        oninput="updatePitchVal(this.value)">
+                    <span id="pitch-val">1</span>x
+                </div>
+                <button class="icon-btn" onclick="toggleSettings()" title="პარამეტრები">⚙️</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div id="slide-text">ტექსტი ჩაიტვირთება...</div>
+        </div>
+
+        <div class="bottom-controls">
+            <div class="nav-controls">
+                <button class="nav-btn" onclick="prevSlide()" title="წინა">
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button class="play-btn" id="play-btn" onclick="togglePlay()">
+                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pause-icon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button class="nav-btn" onclick="nextSlide()" title="შემდეგი">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar" onclick="seekToPosition(event)" onmousemove="updateProgressTooltip(event)" onmouseleave="hideProgressTooltip()">
+                    <div class="progress-fill" id="progress-fill"></div>
+                    <div class="progress-tooltip" id="progress-tooltip"></div>
+                </div>
+                <div class="progress-text" id="counter">0 / 0</div>
+            </div>
+
+            <button class="nav-btn" onclick="toggleFullScreen()" title="სრულ ეკრანზე">
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <h3>პარამეტრები</h3>
+            <button class="icon-btn" onclick="toggleSettings()">✕</button>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">თემა</label>
+            <div class="theme-buttons">
+                <button class="theme-btn" onclick="setTheme(''); updateThemeButtons(this)">☀️ ღია</button>
+                <button class="theme-btn" onclick="setTheme('dark'); updateThemeButtons(this)">🌙 ბნელი</button>
+                <button class="theme-btn" onclick="setTheme('sepia'); updateThemeButtons(this)">📜 სეპია</button>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">ფონტის ტიპი</label>
+            <select class="setting-control" onchange="setFontFamily(this.value)">
+                <option value="sans">Sans-serif</option>
+                <option value="serif">Serif</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">ფონტის ზომა</label>
+            <select class="setting-control" onchange="setFontSize(this.value + 'px')">
+                <option value="20">20px - პატარა</option>
+                <option value="24">24px - საშუალო</option>
+                <option value="28" selected>28px - ნორმალური</option>
+                <option value="32">32px - დიდი</option>
+                <option value="36">36px - ძალიან დიდი</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">პარაგრაფის სიგრძე</label>
+            <select class="setting-control" id="para-length">
+                <option value="short">მოკლე (1-2 წინადადება)</option>
+                <option value="medium" selected>საშუალო (3-5 წინადადება)</option>
+                <option value="long">გრძელი (მთელი პარაგრაფი)</option>
+            </select>
+        </div>
+
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">მონაცემების მართვა</div>
+
+        <div class="setting-item">
+            <button class="primary-btn secondary-btn" onclick="showAllSavedTexts()">
+                <span>📚</span>
+                <span>ყველა შენახული ტექსტი</span>
+            </button>
+        </div>
+
+        <div class="setting-item">
+            <button class="primary-btn secondary-btn" onclick="showBookmarksManager()">
+                <span>🔖</span>
+                <span>სანიშნეების მართვა</span>
+            </button>
+        </div>
+
+        <div class="setting-item">
+            <button class="primary-btn secondary-btn" onclick="showStatsModal()">
+                <span>📊</span>
+                <span>სტატისტიკის ნახვა</span>
+            </button>
+        </div>
+
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">რეზერვული ასლი</div>
+
+        <div class="setting-item">
+            <div class="settings-buttons-row">
+                <button class="primary-btn" onclick="exportData()">
+                    <span>📥</span>
+                    <span>ექსპორტი</span>
+                </button>
+                <button class="primary-btn secondary-btn" onclick="document.getElementById('import-file').click()">
+                    <span>📤</span>
+                    <span>იმპორტი</span>
+                </button>
+            </div>
+            <input type="file" id="import-file" class="hidden-input" accept=".json" onchange="importData(event)">
+        </div>
+
+        <div class="setting-divider"></div>
+        <div class="setting-section-title">გასუფთავება</div>
+
+        <div class="setting-item">
+            <button class="primary-btn secondary-btn" onclick="resetStats()">
+                <span>🔄</span>
+                <span>სტატისტიკის გასუფთავება</span>
+            </button>
+        </div>
+
+        <div class="setting-item">
+            <button class="primary-btn secondary-btn" onclick="clearAllSavedTexts()">
+                <span>🗑️</span>
+                <span>შენახული ტექსტების გასუფთავება</span>
+            </button>
+        </div>
+
+        <div class="setting-item">
+            <button class="primary-btn danger-btn" onclick="factoryReset()">
+                <span>⚠️</span>
+                <span>ყველაფრის გასუფთავება</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" id="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">ტიტული</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <button class="primary-btn secondary-btn" onclick="closeModal()">დახურვა</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
