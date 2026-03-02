@@ -1,24 +1,8 @@
 {
-  "version": 2,
-  "name": "smart-reader-pro",
   "builds": [
     {
-      "src": "index.html",
+      "src": "/**",
       "use": "@vercel/static"
-    },
-    {
-      "src": "Styles.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "script.js",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ]
 }
