@@ -1208,8 +1208,33 @@ body.serif #slide-text {
     /* Settings panel full width on mobile */
     .settings-panel {
         width: 100%;
+        max-width: 100%;
         right: -100%;
         padding: 20px;
+        height: 100vh;
+        max-height: 100vh;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent body scroll when panel is open on mobile */
+    body.panel-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100vh;
+    }
+    
+    /* Better touch scrolling on mobile */
+    .settings-panel * {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ensure panel content scrolls independently */
+    .settings-panel .setting-item,
+    .settings-panel .setting-section-title,
+    .settings-panel .setting-divider {
+        flex-shrink: 0;
     }
 
     /* Input section mobile */

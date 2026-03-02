@@ -437,7 +437,15 @@ function exitReader() {
 
 // Toggle settings panel
 function toggleSettings() {
-    document.getElementById('settings-panel').classList.toggle('active');
+    const panel = document.getElementById('settings-panel');
+    panel.classList.toggle('active');
+    
+    // Prevent body scroll on mobile when panel is open
+    if (panel.classList.contains('active')) {
+        document.body.classList.add('panel-open');
+    } else {
+        document.body.classList.remove('panel-open');
+    }
 }
 
 // Set theme
