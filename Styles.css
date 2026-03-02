@@ -1413,6 +1413,19 @@ body.serif #slide-text {
     }
 }
 
+/* Hide pitch and volume controls everywhere */
+#pitch-range,
+#pitch-range + span,
+.control-group:has(#pitch-range) {
+  display: none !important;
+}
+
+#volume-range,
+#volume-range + span,
+.control-group:has(#volume-range) {
+  display: none !important;
+}
+
 /* Prevent horizontal scrolling on mobile */
 @media (max-width: 768px) {
     body {
