@@ -1357,9 +1357,23 @@ body.serif #slide-text {
     }
 
     /* Show speed control, hide pitch and volume in landscape */
-    .control-group.speed-control { display: flex !important; }
-    .control-group:has(#volume-range),
-    .control-group:has(#pitch-range) { display: none !important; }
+    .control-group.speed-control {
+        display: flex !important;
+    }
+    
+    /* Hide pitch control */
+    #pitch-range,
+    #pitch-range + span,
+    #pitch-range ~ span {
+        display: none !important;
+    }
+    
+    /* Hide volume control */
+    #volume-range,
+    #volume-range + span,
+    #volume-range ~ span {
+        display: none !important;
+    }
 
     .content-area {
         padding: 16px 20px;
