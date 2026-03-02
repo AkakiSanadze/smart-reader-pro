@@ -1356,11 +1356,10 @@ body.serif #slide-text {
         min-width: 36px;
     }
 
-    /* Hide less critical controls in landscape */
-    .control-group:nth-child(5),
-    .control-group:nth-child(6) {
-        display: none;
-    }
+    /* Show speed control, hide pitch and volume in landscape */
+    .control-group.speed-control { display: flex !important; }
+    .control-group:has(#volume-range),
+    .control-group:has(#pitch-range) { display: none !important; }
 
     .content-area {
         padding: 16px 20px;
