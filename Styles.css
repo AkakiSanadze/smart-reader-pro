@@ -1314,3 +1314,102 @@ body.serif #slide-text {
         order: 3;
     }
 }
+
+/* Horizontal/Landscape orientation fixes */
+@media (max-height: 500px) and (orientation: landscape) {
+    #reader-screen {
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile */
+    }
+
+    .top-nav {
+        padding: 8px 16px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-right {
+        flex-wrap: nowrap;
+        max-width: none;
+        gap: 6px;
+    }
+
+    .control-group {
+        padding: 4px 8px;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .control-group select {
+        font-size: 11px;
+        max-width: 70px;
+    }
+
+    .speed-buttons {
+        gap: 2px;
+    }
+
+    .speed-btn {
+        padding: 4px 6px;
+        font-size: 0.65rem;
+        min-width: 36px;
+    }
+
+    /* Hide less critical controls in landscape */
+    .control-group:nth-child(5),
+    .control-group:nth-child(6) {
+        display: none;
+    }
+
+    .content-area {
+        padding: 16px 20px;
+    }
+
+    #slide-text {
+        font-size: 18px;
+        line-height: 1.5;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .bottom-controls {
+        padding: 10px 16px;
+        gap: 12px;
+    }
+
+    .play-btn {
+        width: 48px;
+        height: 48px;
+    }
+
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Settings panel full screen in landscape */
+    .settings-panel {
+        width: 100%;
+        max-width: 100%;
+        right: -100%;
+        padding: 16px;
+        height: 100vh;
+        height: 100dvh;
+    }
+}
+
+/* Prevent horizontal scrolling on mobile */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    #slide-text {
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+}
