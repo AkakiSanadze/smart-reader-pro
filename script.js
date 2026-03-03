@@ -484,10 +484,12 @@ function setSpeed(val) {
     // Update hidden input
     document.getElementById('rate-range').value = val;
     
-    // Update active button
-    document.querySelectorAll('.speed-btn').forEach(btn => {
-        btn.classList.toggle('active', parseFloat(btn.dataset.speed) === val);
-    });
+    // Update slider value if it exists
+    const slider = document.getElementById('speed-slider');
+    if (slider) {
+        slider.value = val;
+        updateSpeedDisplay(val);
+    }
     
     localStorage.setItem('ttsRate', val);
     
@@ -495,6 +497,30 @@ function setSpeed(val) {
         if (currentUtterance) currentUtterance.onend = null;
         synth.cancel();
         readCurrentSlide();
+    }
+}
+
+// Update speed slider display
+function updateSpeedSlider(val) {
+    const speedVal = parseFloat(val);
+    document.getElementById('rate-range').value = speedVal;
+    updateSpeedDisplay(speedVal);
+    localStorage.setItem('ttsRate', speedVal);
+    
+    if (isPlaying) {
+        if (currentUtterance) currentUtterance.onend = null;
+        synth.cancel();
+        readCurrentSlide();
+    }
+}
+
+// Update speed display value
+function updateSpeedDisplay(val) {
+    const display = document.getElementById('speed-val');
+    if (display) {
+        // Round to 2 decimal places, but remove trailing zeros
+        const formatted = parseFloat(val).toFixed(val % 1 === 0 ? 0 : 2);
+        display.textContent = formatted + 'x';
     }
 }
 
@@ -722,11 +748,11 @@ window.onload = () => {
     const rate = parseFloat(savedRate);
     document.getElementById('rate-range').value = rate;
     
-    // Set active speed button
-    const speedBtn = document.querySelector(`.speed-btn[data-speed="${rate}"]`);
-    if (speedBtn) {
-        document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
-        speedBtn.classList.add('active');
+    // Initialize slider and display
+    const speedSlider = document.getElementById('speed-slider');
+    if (speedSlider) {
+        speedSlider.value = rate;
+        updateSpeedDisplay(rate);
     }
     
     const savedVolume = localStorage.getItem('ttsVolume');

@@ -739,7 +739,72 @@ textarea:focus {
 }
 
 .speed-control {
-    padding: 4px;
+    padding: 4px 8px;
+}
+
+#speed-slider {
+    width: 80px;
+    cursor: pointer;
+}
+
+#speed-val {
+    min-width: 36px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--accent-color);
+}
+
+/* Speed slider styling for webkit browsers */
+#speed-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+#speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    margin-top: -6px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s;
+}
+
+#speed-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Speed slider for Firefox */
+#speed-slider::-moz-range-track {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+#speed-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile responsive styles for speed slider */
+@media (max-width: 768px) {
+    #speed-slider {
+        width: 60px;
+    }
+    
+    #speed-val {
+        min-width: 32px;
+        font-size: 0.8rem;
+    }
 }
 
 .speed-buttons {
