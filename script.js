@@ -649,7 +649,42 @@ const toggleFullScreen = () => !document.fullscreenElement ? document.documentEl
 const prevSlide = () => ReaderEngine.prev();
 const nextSlide = () => ReaderEngine.next();
 const togglePlay = () => ReaderEngine.togglePlay();
-const resetStats = () => StatsManager.reset();
+
+function factoryReset() {
+    if (confirm('დარწმუნებული ხართ რომ გსურთ ყველა მონაცემის წაშლა?')) {
+        StatsManager.data = { totalTexts: 0, totalMinutes: 0, totalWords: 0, totalSessions: 0 };
+        StatsManager.save();
+        StorageManager.savedTexts = [];
+        Storage.set('savedTexts', []);
+        Storage.set('lastText', '');
+        StorageManager.renderList();
+        Toast.success('მონაცემები წაშლილია');
+    }
+}
+
+function exportData() {
+    const data = {
+        stats: StatsManager.data,
+        savedTexts: StorageManager.savedTexts
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'smart-reader-backup.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    Toast.success('მონაცემები ექსპორტირებულია');
+}
+
+function seekToPosition(event) {
+    const bar = document.getElementById('progress-bar');
+    const rect = bar.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    const index = Math.floor(percent * AppState.slides.length);
+    AppState.currentIndex = Math.max(0, Math.min(index, AppState.slides.length - 1));
+    ReaderEngine.handlePlaybackTransition();
+}
 
 // Load everything
 window.onload = () => {
@@ -1034,3 +1069,14 @@ window.toggleFocusMode = toggleFocusMode;
 window.loadDemo = loadDemo;
 window.clearInput = clearInput;
 window.pasteFromClipboard = pasteFromClipboard;
+window.clearAndExit = clearAndExit;
+window.saveCurrentText = saveCurrentText;
+window.setFontSize = setFontSize;
+window.setFontFamily = setFontFamily;
+window.toggleFullScreen = toggleFullScreen;
+window.prevSlide = prevSlide;
+window.nextSlide = nextSlide;
+window.togglePlay = togglePlay;
+window.factoryReset = factoryReset;
+window.exportData = exportData;
+window.seekToPosition = seekToPosition;
