@@ -6,7 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Smart Reader Pro</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <!-- manifest removed for local file compatibility -->
+    <script>
+        // Only load manifest on HTTP/HTTPS (not file://)
+        if (window.location.protocol.startsWith('http')) {
+            document.write('<link rel="manifest" href="manifest.json">');
+        }
+    </script>
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,7 +42,7 @@
                     <div class="quick-actions">
                         <button class="quick-btn" onclick="loadDemo()" aria-label="დემო">✨ Demo</button>
                         <button class="quick-btn" onclick="pasteFromClipboard()" aria-label="ჩასმა">📋 Paste</button>
-                        <button class="quick-btn" onclick="document.getElementById('text-input').value = ''" aria-label="გასუფთავება">🗑️ Clear</button>
+                        <button class="quick-btn" onclick="clearInput()" aria-label="გასუფთავება">🗑️ Clear</button>
                     </div>
                 </div>
                 <textarea id="text-input" placeholder="ჩასვით თქვენი ტექსტი აქ..."></textarea>
@@ -79,7 +84,7 @@
             <div class="nav-left">
                 <button class="icon-btn" onclick="exitReader()" aria-label="მთავარი">🏠</button>
                 <button class="icon-btn" onclick="saveCurrentText()" aria-label="შენახვა">💾</button>
-                <button class="icon-btn" onclick="showBookmarksManager()" aria-label="სანიშნეები">📑</button>
+                <button class="icon-btn" onclick="clearAndExit()" aria-label="გასუფთავება">🗑️</button>
             </div>
 
             <div class="nav-right">
@@ -176,7 +181,7 @@
 
         <div class="setting-item">
             <label class="setting-label">პარაგრაფის სიგრძე</label>
-            <select class="setting-control" id="para-length">
+            <select class="setting-control" id="para-length" onchange="localStorage.setItem('paraLength', this.value)">
                 <option value="short">მოკლე (1-2 წინადადება)</option>
                 <option value="medium" selected>საშუალო (3-5 წინადადება)</option>
                 <option value="long">გრძელი (მთელი პარაგრაფი)</option>

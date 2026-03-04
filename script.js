@@ -12,6 +12,36 @@ const AppState = {
     currentUtterance: null
 };
 
+// Safe localStorage helpers
+const Storage = {
+    get(key, fallback = null) {
+        try {
+            const val = localStorage.getItem(key);
+            if (val === null) return fallback;
+            // Try to parse as JSON, fallback to plain string
+            try {
+                return JSON.parse(val);
+            } catch {
+                return val;
+            }
+        } catch (e) {
+            console.warn('Storage.get error:', e);
+            return fallback;
+        }
+    },
+    set(key, value) {
+        try {
+            if (typeof value === 'string') {
+                localStorage.setItem(key, value);
+            } else {
+                localStorage.setItem(key, JSON.stringify(value));
+            }
+        } catch (e) {
+            console.warn('Storage.set error:', e);
+        }
+    }
+};
+
 // ==================== STATISTICS MODULE ====================
 const StatsManager = {
     data: {
@@ -22,28 +52,24 @@ const StatsManager = {
     },
 
     load() {
-        const saved = localStorage.getItem('readerStats');
+        const saved = Storage.get('readerStats');
         if (saved) {
-            this.data = JSON.parse(saved);
+            this.data = saved;
             this.updateDisplay();
         }
     },
 
     save() {
-        localStorage.setItem('readerStats', JSON.stringify(this.data));
+        Storage.set('readerStats', this.data);
         this.updateDisplay();
     },
 
     updateDisplay() {
         const elTexts = document.getElementById('stat-texts');
         const elTime = document.getElementById('stat-time');
-        const elWords = document.getElementById('stat-words');
-        const elSessions = document.getElementById('stat-sessions');
 
         if (elTexts) elTexts.textContent = this.data.totalTexts;
         if (elTime) elTime.textContent = Math.round(this.data.totalMinutes);
-        if (elWords) elWords.textContent = this.data.totalWords.toLocaleString();
-        if (elSessions) elSessions.textContent = this.data.totalSessions;
     },
 
     addSession(wordCount) {
@@ -71,24 +97,27 @@ const StorageManager = {
     savedTexts: [],
 
     loadSavedTexts() {
-        const saved = localStorage.getItem('savedTexts');
+        const saved = Storage.get('savedTexts', []);
         if (saved) {
-            this.savedTexts = JSON.parse(saved);
+            this.savedTexts = saved;
             this.renderList();
         }
     },
 
     saveText(text) {
         if (!text) return;
+
+        const title = prompt('სათაური:');
+        if (title === null) return; // User cancelled
+
         const preview = text.substring(0, 80) + (text.length > 80 ? '...' : '');
-        const words = text.split(/\s+/).length;
         const date = new Date().toLocaleDateString('ka-GE');
-        
-        const item = { text, preview, words, date, timestamp: Date.now() };
+
+        const item = { text, preview, title: title.trim() || 'უსათაურო', date, timestamp: Date.now() };
         this.savedTexts.unshift(item);
         if (this.savedTexts.length > 20) this.savedTexts = this.savedTexts.slice(0, 20);
-        
-        localStorage.setItem('savedTexts', JSON.stringify(this.savedTexts));
+
+        Storage.set('savedTexts', this.savedTexts);
         this.renderList();
         alert('✅ ტექსტი შენახულია!');
     },
@@ -97,7 +126,7 @@ const StorageManager = {
         if (event) event.stopPropagation();
         if (confirm('გსურთ ამ ტექსტის წაშლა?')) {
             this.savedTexts.splice(index, 1);
-            localStorage.setItem('savedTexts', JSON.stringify(this.savedTexts));
+            Storage.set('savedTexts', this.savedTexts);
             this.renderList();
             if (document.getElementById('modal-overlay').classList.contains('active')) {
                 showAllSavedTexts();
@@ -116,8 +145,8 @@ const StorageManager = {
             <div class="saved-text-item" onclick="TextProcessor.loadToInput(${idx})">
                 <div class="saved-text-preview">${item.preview}</div>
                 <div class="saved-text-meta">
+                    <span>${item.title || 'უსათაურო'}</span>
                     <span>${item.date}</span>
-                    <span>${item.words} სიტყვა</span>
                 </div>
                 <button class="saved-text-delete" onclick="StorageManager.deleteText(${idx}, event)">✕</button>
             </div>
@@ -397,17 +426,21 @@ const UI = {
     },
 
     loadSettings() {
-        const theme = localStorage.getItem('theme') || '';
+        const theme = Storage.get('theme', '');
         document.body.className = theme;
         document.getElementById('theme-select').value = theme;
-        
-        const rate = localStorage.getItem('ttsRate') || '1';
+
+        const rate = Storage.get('ttsRate', '1');
         document.getElementById('rate-range').value = rate;
         document.getElementById('speed-slider').value = rate;
         document.getElementById('speed-val').textContent = rate + 'x';
-        
-        document.getElementById('volume-range').value = localStorage.getItem('ttsVolume') || '1';
-        document.getElementById('pitch-range').value = localStorage.getItem('ttsPitch') || '1';
+
+        document.getElementById('volume-range').value = Storage.get('ttsVolume', '1');
+        document.getElementById('pitch-range').value = Storage.get('ttsPitch', '1');
+
+        // Load saved paragraph length preference
+        const paraLength = Storage.get('paraLength', 'medium');
+        document.getElementById('para-length').value = paraLength;
     },
 
     updateVoices() {
@@ -432,13 +465,14 @@ const UI = {
             select.appendChild(group);
         });
 
-        const saved = localStorage.getItem('selectedVoiceName');
+        const saved = Storage.get('selectedVoiceName');
         if (saved) select.value = saved;
     },
 
     attachListeners() {
         window.speechSynthesis.onvoiceschanged = () => this.updateVoices();
-        
+
+        // Keyboard navigation in reader
         document.addEventListener('keydown', (e) => {
             if (document.getElementById('reader-screen').style.display === 'flex') {
                 if (e.key === "ArrowRight") ReaderEngine.next();
@@ -447,6 +481,35 @@ const UI = {
                 if (e.key === "Escape") exitReader();
             }
         });
+
+        // Touch swipe gestures for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        const minSwipeDistance = 50;
+        const maxVerticalDiff = 100;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (document.getElementById('reader-screen').style.display !== 'flex') return;
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = Math.abs(touchEndY - touchStartY);
+
+            // Only trigger if horizontal swipe and not too vertical
+            if (Math.abs(diffX) > minSwipeDistance && diffY < maxVerticalDiff) {
+                if (diffX > 0) {
+                    ReaderEngine.prev(); // Swipe right = previous
+                } else {
+                    ReaderEngine.next(); // Swipe left = next
+                }
+            }
+        }, { passive: true });
     }
 };
 
@@ -458,14 +521,14 @@ function startReading() {
     AppState.originalText = TextProcessor.clean(text);
     const mode = document.getElementById('para-length').value;
     AppState.slides = TextProcessor.splitIntoSlides(AppState.originalText, mode);
-    
+
     AppState.currentIndex = 0;
     AppState.bookmarkedSlides.clear();
     AppState.sessionStartTime = Date.now();
-    
+
     StatsManager.addSession(AppState.originalText.split(/\s+/).length);
-    localStorage.setItem('lastText', AppState.originalText);
-    
+    Storage.set('lastText', AppState.originalText);
+
     showScreen('reader-screen');
     ReaderEngine.updateSlide();
 }
@@ -476,6 +539,9 @@ function exitReader() {
         AppState.sessionStartTime = null;
     }
     ReaderEngine.stop();
+    // Clear text when exiting reader
+    document.getElementById('text-input').value = '';
+    Storage.set('lastText', '');
     showScreen('landing-screen');
 }
 
@@ -490,31 +556,29 @@ function toggleSettings() {
 }
 
 function setTheme(t) {
-    localStorage.setItem('theme', t);
+    Storage.set('theme', t);
     document.body.className = t;
 }
 
 function updateSpeedSlider(v) {
     document.getElementById('rate-range').value = v;
     document.getElementById('speed-val').textContent = v + 'x';
-    localStorage.setItem('ttsRate', v);
+    Storage.set('ttsRate', v);
     if (AppState.isPlaying) ReaderEngine.handlePlaybackTransition();
 }
 
 function updateVolumeVal(v) {
-    document.getElementById('volume-val').innerText = Math.round(v * 100);
-    localStorage.setItem('ttsVolume', v);
+    Storage.set('ttsVolume', v);
     if (AppState.isPlaying) ReaderEngine.handlePlaybackTransition();
 }
 
 function updatePitchVal(v) {
-    document.getElementById('pitch-val').innerText = v;
-    localStorage.setItem('ttsPitch', v);
+    Storage.set('ttsPitch', v);
     if (AppState.isPlaying) ReaderEngine.handlePlaybackTransition();
 }
 
 function updateVoicePreference() {
-    localStorage.setItem('selectedVoiceName', document.getElementById('voice-select').value);
+    Storage.set('selectedVoiceName', document.getElementById('voice-select').value);
     if (AppState.isPlaying) ReaderEngine.handlePlaybackTransition();
 }
 
@@ -525,13 +589,51 @@ function toggleBookmark() {
 }
 
 // Pass-throughs for simple access
-const loadDemo = () => document.getElementById('text-input').value = "საქართველო არის ქვეყანა კავკასიაში... (დემო)";
+const loadDemo = () => document.getElementById('text-input').value = `The Art of Learning a New Language
+
+Learning a new language is one of the most rewarding challenges a person can undertake. It opens doors to new cultures, new friendships, and new opportunities that would otherwise remain hidden behind the barrier of unfamiliar words.
+
+When we think about language learning, many of us imagine endless vocabulary lists and grammar exercises. While these tools certainly have their place, the most effective approach combines multiple methods. Reading authentic materials, listening to native speakers, and practicing with real conversations all contribute to building fluency.
+
+The journey of language learning is not without its obstacles. There will be moments of frustration when words refuse to come out correctly, and days when understanding seems impossibly far away. However, these challenges are precisely what make the achievement so meaningful. Each small victory, from ordering coffee in a foreign language to reading a book without translation, builds confidence and motivation for the next step.
+
+Modern technology has transformed language learning in remarkable ways. Apps can now connect learners with native speakers across the globe, while artificial intelligence provides instant feedback on pronunciation and grammar. Yet despite these advances, the fundamental truth remains unchanged: consistent practice and genuine curiosity are the keys to mastery.
+
+Perhaps the most beautiful aspect of learning languages is how it changes our perception of the world. When we learn a new language, we don't just acquire new words—we gain new ways of thinking. Different languages offer different perspectives on reality, and by learning them, we expand our own understanding of what it means to communicate, to express, to connect with others.
+
+The benefits extend far beyond simple communication. Bilingual individuals often demonstrate enhanced cognitive abilities, including better problem-solving skills and improved memory. They tend to be more empathetic and culturally aware, having learned to see the world through different linguistic lenses.
+
+Whatever your motivation for learning—whether professional advancement, travel plans, or pure intellectual curiosity—remember that every expert was once a beginner. The path to fluency is measured in small, consistent steps rather than giant leaps. Today you might learn ten new words; tomorrow you might master a tricky grammatical structure. These individual moments accumulate into profound transformation.
+
+So embrace the journey. Make mistakes, ask questions, and celebrate progress, no matter how small it might seem. The world has over seven thousand languages to offer, each waiting to be discovered by curious minds like yours.`;
+
+const clearInput = () => {
+    document.getElementById('text-input').value = '';
+    Storage.set('lastText', '');
+};
+
+// Clear and exit reader - for reader screen clear button
+const clearAndExit = () => {
+    document.getElementById('text-input').value = '';
+    Storage.set('lastText', '');
+    exitReader();
+};
+
 const pasteFromClipboard = async () => {
-    try { document.getElementById('text-input').value = await navigator.clipboard.readText(); }
-    catch(e) { alert('❌ ვერ მოხერხდა'); }
+    try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('text-input').value = text;
+    } catch (e) {
+        // Fallback for file:// protocol
+        if (e.name === 'NotAllowedError') {
+            alert('📋 გამოიყენეთ Ctrl+V (Cmd+V) ჩასაკრებლისთვის');
+        } else {
+            alert('❌ ვერ მოხერხდა');
+        }
+    }
 };
 const saveCurrentText = () => StorageManager.saveText(AppState.originalText);
-const setFontSize = (s) => document.documentElement.style.setProperty('--font-size', s);
+const setFontSize = (s) => document.documentElement.style.setProperty('--reader-size', s + 'px');
 const setFontFamily = (f) => document.body.classList.toggle('serif', f === 'serif');
 const toggleFullScreen = () => !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen();
 const prevSlide = () => ReaderEngine.prev();
@@ -542,9 +644,15 @@ const resetStats = () => StatsManager.reset();
 // Load everything
 window.onload = () => {
     UI.init();
-    const last = localStorage.getItem('lastText');
+    const last = Storage.get('lastText');
     if (last) document.getElementById('text-input').value = last;
 };
+
+// Memory cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (typeof GeorgianTTS !== 'undefined') GeorgianTTS.stop();
+    window.speechSynthesis.cancel();
+});
 
 // ... Rest of modal and export logic remains similar but cleaned ...
 function openModal(title, bodyHtml, footerHtml = null) {
@@ -560,7 +668,7 @@ function showAllSavedTexts() {
     const html = StorageManager.savedTexts.map((item, idx) => `
         <div class="saved-texts-modal-item" onclick="TextProcessor.loadToInput(${idx}); closeModal();">
             <div class="preview">${item.preview}</div>
-            <div class="meta"><span>${item.date}</span><span>${item.words} სიტყვა</span></div>
+            <div class="meta"><span>${item.title || 'უსათაურო'}</span><span>${item.date}</span></div>
         </div>
     `).join('');
     openModal('შენახული ტექსტები', `<div class="saved-texts-modal-list">${html}</div>`);
