@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Smart Reader Pro - ჭკვიანი მკითხველი</title>
+    <title>Smart Reader Pro</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6366f1">
+    <!-- manifest removed for local file compatibility -->
+    <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Smart Reader">
@@ -20,105 +20,55 @@
 <body>
     <!-- ==================== LANDING SCREEN ==================== -->
     <div id="landing-screen">
-        <!-- Floating Settings Button - only on landing page -->
-        <button class="settings-floating-btn" onclick="toggleSettings()" title="პარამეტრები">⚙️</button>
+        <button class="settings-floating-btn" onclick="toggleSettings()" title="პარამეტრები" aria-label="პარამეტრები">
+            ⚙️
+        </button>
+        
         <div class="hero-section">
-            <div class="hero-content">
-                <div class="logo">📖</div>
-                <h1>Smart Reader Pro</h1>
-            </div>
+            <span class="logo">📖</span>
+            <h1>Smart Reader Pro</h1>
+            <p class="subtitle">წაიკითხეთ და მოუსმინეთ ნებისმიერ ტექსტს სწრაფად და ეფექტურად.</p>
         </div>
 
-        <div class="main-content">
-            <div class="content-grid">
-                <div class="input-section">
-                    <div class="section-header">
-                        <h2 class="section-title">დაიწყეთ კითხვა</h2>
-                        <div class="quick-actions">
-                            <button class="quick-btn" onclick="loadDemo()">
-                                <span>✨</span>
-                                <span>Demo</span>
-                            </button>
-                            <button class="quick-btn" onclick="pasteFromClipboard()">
-                                <span>📋</span>
-                                <span>ჩასმა</span>
-                            </button>
-                            <button class="quick-btn" onclick="document.getElementById('text-input').value = ''">
-                                <span>🗑️</span>
-                                <span>გასუფთავება</span>
-                            </button>
-                        </div>
+        <div class="content-grid">
+            <div class="input-section">
+                <div class="section-header">
+                    <h2 class="section-title">ახალი ტექსტი</h2>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="loadDemo()" aria-label="დემო">✨ Demo</button>
+                        <button class="quick-btn" onclick="pasteFromClipboard()" aria-label="ჩასმა">📋 Paste</button>
+                        <button class="quick-btn" onclick="document.getElementById('text-input').value = ''" aria-label="გასუფთავება">🗑️ Clear</button>
                     </div>
-                    <textarea id="text-input" placeholder="ჩასვით ან აკრიფეთ თქვენი ტექსტი აქ...&#10;&#10;მაგალითად, სტატია, წიგნის თავი, ესე, ან ნებისმიერი სხვა ტექსტი რომლის მოსმენაც გსურთ."></textarea>
-                    <button class="primary-btn" onclick="startReading()">
-                        <span>🎯</span>
-                        <span>დაწყება</span>
-                    </button>
                 </div>
+                <textarea id="text-input" placeholder="ჩასვით თქვენი ტექსტი აქ..."></textarea>
+                <button class="primary-btn" onclick="startReading()" aria-label="დაწყება">
+                    <span>დაწყება</span> 
+                    <span style="font-size: 1.2rem">→</span>
+                </button>
+            </div>
 
-                <div class="sidebar">
-                    <div class="stats-card">
-                        <h3 class="section-title">სტატისტიკა</h3>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-value" id="stat-texts">0</div>
-                                <div class="stat-label">ტექსტი</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="stat-time">0</div>
-                                <div class="stat-label">წუთი</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="stat-words">0</div>
-                                <div class="stat-label">სიტყვა</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="stat-sessions">0</div>
-                                <div class="stat-label">სესია</div>
-                            </div>
+            <div class="sidebar">
+                <div class="stats-card">
+                    <h3 class="section-title" style="margin-bottom: 1rem">სტატისტიკა</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="stat-texts">0</span>
+                            <span class="stat-label">ტექსტი</span>
                         </div>
-                    </div>
-
-                    <div class="saved-texts-card">
-                        <h3 class="section-title">შენახული ტექსტები</h3>
-                        <div id="saved-texts-list">
-                            <div class="empty-state">
-                                <div style="font-size: 48px; margin-bottom: 12px;">📚</div>
-                                <div>ჯერ არ გაქვთ შენახული ტექსტები</div>
-                            </div>
-                        </div>
-                        <div class="view-all-link" onclick="showAllSavedTexts()">
-                            ყველას ნახვა →
+                        <div class="stat-item">
+                            <span class="stat-value" id="stat-time">0</span>
+                            <span class="stat-label">წუთი</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="hero-content" style="margin-top: 40px;">
-            <p class="subtitle">თქვენი პირადი ასისტენტი ტექსტების სწრაფად და ეფექტურად წასაკითხად. მოუსმინეთ ნებისმიერ ტექსტს ხმამაღლა, დაზოგეთ დრო და გაზარდეთ პროდუქტიულობა.</p>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🎧</div>
-                <div class="feature-title">ხმოვანი კითხვა</div>
-                <div class="feature-desc">ბუნებრივი ხმა ინგლისურ და რუსულ ენებზე</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <div class="feature-title">პროგრესის ტრეკინგი</div>
-                <div class="feature-desc">თვალი ადევნეთ წაკითხულ ტექსტებს და დახარჯულ დროს</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🌙</div>
-                <div class="feature-title">თვალის დაცვა</div>
-                <div class="feature-desc">ღამის რეჟიმი და სეპია თემა კომფორტული კითხვისთვის</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <div class="feature-title">სწრაფი ნავიგაცია</div>
-                <div class="feature-desc">ადვილად გადაადგილდით პარაგრაფებს შორის</div>
+                <div class="saved-texts-card" style="margin-top: 1.5rem">
+                    <h3 class="section-title" style="margin-bottom: 1rem">ბოლო ტექსტები</h3>
+                    <div id="saved-texts-list">
+                        <!-- Items will be injected here -->
+                    </div>
+                    <div class="view-all-link" onclick="showAllSavedTexts()">ყველას ნახვა</div>
+                </div>
             </div>
         </div>
     </div>
@@ -127,87 +77,72 @@
     <div id="reader-screen">
         <div class="top-nav">
             <div class="nav-left">
-                <button class="icon-btn" onclick="exitReader()" title="გასვლა">🏠</button>
-                <button class="icon-btn" onclick="saveCurrentText()" title="შენახვა">💾</button>
-                <button class="icon-btn" onclick="toggleBookmark()" title="სანიშნე" id="bookmark-btn">🔖</button>
-                <button class="icon-btn" onclick="showBookmarksManager()" title="სანიშნეები">📑</button>
+                <button class="icon-btn" onclick="exitReader()" aria-label="მთავარი">🏠</button>
+                <button class="icon-btn" onclick="saveCurrentText()" aria-label="შენახვა">💾</button>
+                <button class="icon-btn" onclick="showBookmarksManager()" aria-label="სანიშნეები">📑</button>
             </div>
 
             <div class="nav-right">
                 <div id="current-voice-display" class="voice-badge" style="display:none"></div>
+                
                 <div class="control-group">
                     <span>🎨</span>
-                    <select id="theme-select" onchange="setTheme(this.value)">
-                        <option value="system">სისტემა</option>
+                    <select id="theme-select" onchange="setTheme(this.value)" aria-label="თემა">
                         <option value="">ღია</option>
-                        <option value="dark">ბნელი</option>
+                        <option value="dark">მუქი</option>
                         <option value="sepia">სეპია</option>
                     </select>
                 </div>
-                <div class="control-group">
-                    <span>📏</span>
-                    <select onchange="setFontSize(this.value + 'px')">
-                        <option value="20">20px</option>
-                        <option value="24">24px</option>
-                        <option value="28" selected>28px</option>
-                        <option value="32">32px</option>
-                        <option value="36">36px</option>
-                    </select>
-                </div>
+
                 <div class="control-group">
                     <span>🗣️</span>
-                    <select id="voice-select" onchange="updateVoicePreference()"></select>
+                    <select id="voice-select" onchange="updateVoicePreference()" aria-label="ხმა"></select>
                 </div>
-                <div class="control-group speed-control">
+
+                <div class="control-group">
                     <span>⚡</span>
-                    <input type="range" id="speed-slider" min="0.5" max="3" step="0.05" value="1"
-                        oninput="updateSpeedSlider(this.value)">
-                    <span id="speed-val">1x</span>
+                    <input type="range" id="speed-slider" min="0.5" max="3" step="0.1" value="1" oninput="updateSpeedSlider(this.value)" aria-label="სიჩქარე">
+                    <span id="speed-val" style="font-size: 0.8rem; font-weight: 600; min-width: 24px;">1x</span>
                     <input type="hidden" id="rate-range" value="1">
                 </div>
-                <div class="control-group">
-                    <span>🔊</span>
-                    <input type="range" id="volume-range" min="0" max="1" step="0.1" value="1"
-                        oninput="updateVolumeVal(this.value)">
-                    <span id="volume-val">100</span>%
-                </div>
-                <div class="control-group">
-                    <span>🎵</span>
-                    <input type="range" id="pitch-range" min="0.5" max="2" step="0.1" value="1"
-                        oninput="updatePitchVal(this.value)">
-                    <span id="pitch-val">1</span>x
-                </div>
-                <button class="icon-btn" onclick="toggleSettings()" title="პარამეტრები">⚙️</button>
+
+                <!-- Hidden inputs for logic compatibility, controlled via Settings Panel -->
+                <input type="hidden" id="volume-range" value="1">
+                <input type="hidden" id="pitch-range" value="1">
+
+                <button class="icon-btn" onclick="toggleSettings()" aria-label="პარამეტრები">⚙️</button>
             </div>
         </div>
 
         <div class="content-area">
-            <div id="slide-text">ტექსტი ჩაიტვირთება...</div>
+            <div id="slide-text">ტექსტი იტვირთება...</div>
         </div>
 
         <div class="bottom-controls">
             <div class="nav-controls">
-                <button class="nav-btn" onclick="prevSlide()" title="წინა">
+                <button class="nav-btn" onclick="prevSlide()" aria-label="უკან">
                     <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
                 </button>
-                <button class="play-btn" id="play-btn" onclick="togglePlay()">
+                <button class="play-btn" id="play-btn" onclick="togglePlay()" aria-label="დაკვრა">
                     <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     <svg id="pause-icon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                 </button>
-                <button class="nav-btn" onclick="nextSlide()" title="შემდეგი">
+                <button class="nav-btn" onclick="nextSlide()" aria-label="წინ">
                     <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
             </div>
 
             <div class="progress-container">
-                <div class="progress-bar" id="progress-bar" onclick="seekToPosition(event)" onmousemove="updateProgressTooltip(event)" onmouseleave="hideProgressTooltip()">
-                    <div class="progress-fill" id="progress-fill"></div>
-                    <div class="progress-tooltip" id="progress-tooltip"></div>
+                <div class="progress-text">
+                    <span id="counter">0 / 0</span>
+                    <button class="icon-btn" style="width: auto; height: auto; font-size: 1rem;" onclick="toggleBookmark()" id="bookmark-btn">🏷️</button>
                 </div>
-                <div class="progress-text" id="counter">0 / 0</div>
+                <div class="progress-bar" id="progress-bar" onclick="seekToPosition(event)">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
             </div>
 
-            <button class="nav-btn" onclick="toggleFullScreen()" title="სრულ ეკრანზე">
+            <button class="nav-btn" onclick="toggleFullScreen()" aria-label="სრული ეკრანი">
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
         </div>
@@ -221,30 +156,21 @@
         </div>
 
         <div class="setting-item">
-            <label class="setting-label">თემა</label>
-            <div class="theme-buttons">
-                <button class="theme-btn" onclick="setTheme(''); updateThemeButtons(this)">☀️ ღია</button>
-                <button class="theme-btn" onclick="setTheme('dark'); updateThemeButtons(this)">🌙 ბნელი</button>
-                <button class="theme-btn" onclick="setTheme('sepia'); updateThemeButtons(this)">📜 სეპია</button>
-            </div>
-        </div>
-
-        <div class="setting-item">
-            <label class="setting-label">ფონტის ტიპი</label>
-            <select class="setting-control" onchange="setFontFamily(this.value)">
-                <option value="sans">Sans-serif</option>
-                <option value="serif">Serif</option>
+            <label class="setting-label">შრიფტის ზომა</label>
+            <select class="setting-control" onchange="setFontSize(this.value + 'px')">
+                <option value="20">პატარა</option>
+                <option value="24">საშუალო</option>
+                <option value="28" selected>ნორმალური</option>
+                <option value="32">დიდი</option>
+                <option value="36">ძალიან დიდი</option>
             </select>
         </div>
 
         <div class="setting-item">
-            <label class="setting-label">ფონტის ზომა</label>
-            <select class="setting-control" onchange="setFontSize(this.value + 'px')">
-                <option value="20">20px - პატარა</option>
-                <option value="24">24px - საშუალო</option>
-                <option value="28" selected>28px - ნორმალური</option>
-                <option value="32">32px - დიდი</option>
-                <option value="36">36px - ძალიან დიდი</option>
+            <label class="setting-label">შრიფტის ტიპი</label>
+            <select class="setting-control" onchange="setFontFamily(this.value)">
+                <option value="sans">Sans-serif (თანამედროვე)</option>
+                <option value="serif">Serif (წიგნისებული)</option>
             </select>
         </div>
 
@@ -257,89 +183,57 @@
             </select>
         </div>
 
-        <div class="setting-divider"></div>
-        <div class="setting-section-title">მონაცემების მართვა</div>
-
         <div class="setting-item">
-            <button class="primary-btn secondary-btn" onclick="showAllSavedTexts()">
-                <span>📚</span>
-                <span>ყველა შენახული ტექსტი</span>
-            </button>
-        </div>
-
-        <div class="setting-item">
-            <button class="primary-btn secondary-btn" onclick="showBookmarksManager()">
-                <span>🔖</span>
-                <span>სანიშნეების მართვა</span>
-            </button>
-        </div>
-
-        <div class="setting-item">
-            <button class="primary-btn secondary-btn" onclick="showStatsModal()">
-                <span>📊</span>
-                <span>სტატისტიკის ნახვა</span>
-            </button>
-        </div>
-
-        <div class="setting-divider"></div>
-        <div class="setting-section-title">რეზერვული ასლი</div>
-
-        <div class="setting-item">
-            <div class="settings-buttons-row">
-                <button class="primary-btn" onclick="exportData()">
-                    <span>📥</span>
-                    <span>ექსპორტი</span>
-                </button>
-                <button class="primary-btn secondary-btn" onclick="document.getElementById('import-file').click()">
-                    <span>📤</span>
-                    <span>იმპორტი</span>
-                </button>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <label class="setting-label" style="margin:0">🇬🇪 ქართული ხმა</label>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="georgian-tts-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </div>
             </div>
-            <input type="file" id="import-file" class="hidden-input" accept=".json" onchange="importData(event)">
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.5rem">ჩართეთ Google-ის ხმა თუ სისტემური ხმა არ გაქვთ.</p>
         </div>
 
         <div class="setting-divider"></div>
-        <div class="setting-section-title">გასუფთავება</div>
 
+        <div class="setting-section-title">აუდიო</div>
+        
         <div class="setting-item">
-            <button class="primary-btn secondary-btn" onclick="resetStats()">
-                <span>🔄</span>
-                <span>სტატისტიკის გასუფთავება</span>
-            </button>
+            <label class="setting-label">ხმის სიმძლავრე</label>
+            <input type="range" style="width:100%" min="0" max="1" step="0.1" value="1" oninput="updateVolumeVal(this.value)">
         </div>
 
         <div class="setting-item">
-            <button class="primary-btn secondary-btn" onclick="clearAllSavedTexts()">
-                <span>🗑️</span>
-                <span>შენახული ტექსტების გასუფთავება</span>
-            </button>
+            <label class="setting-label">ტონალობა (Pitch)</label>
+            <input type="range" style="width:100%" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchVal(this.value)">
+        </div>
+
+        <div class="setting-divider"></div>
+
+        <div class="setting-item">
+            <button class="primary-btn secondary-btn" onclick="exportData()">📤 მონაცემების ექსპორტი</button>
+            <button class="primary-btn secondary-btn" onclick="document.getElementById('import-file').click()">📥 მონაცემების იმპორტი</button>
+            <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
         </div>
 
         <div class="setting-item">
-            <button class="primary-btn danger-btn" onclick="factoryReset()">
-                <span>⚠️</span>
-                <span>ყველაფრის გასუფთავება</span>
-            </button>
+            <button class="primary-btn danger-btn" onclick="factoryReset()">⚠️ მონაცემების წაშლა</button>
         </div>
     </div>
 
-    <!-- Modal Container -->
+    <!-- Modal -->
     <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" id="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modal-title">ტიტული</h3>
-                <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="settings-header" style="margin-bottom: 1rem">
+                <h3 id="modal-title">სათაური</h3>
+                <button class="icon-btn" onclick="closeModal()">✕</button>
             </div>
-            <div class="modal-body" id="modal-body">
-                <!-- Dynamic content -->
-            </div>
-            <div class="modal-footer" id="modal-footer">
-                <button class="primary-btn secondary-btn" onclick="closeModal()">დახურვა</button>
-            </div>
+            <div id="modal-body"></div>
+            <div id="modal-footer" style="margin-top: 1.5rem; text-align: right;"></div>
         </div>
     </div>
 
+    <script src="georgian-tts.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>
