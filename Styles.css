@@ -1190,10 +1190,9 @@ input:checked + .toggle-slider:before { transform: translateX(22px); }
         padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
     }
 
-    /* Fullscreen button hide on mobile if not needed */
+    /* Fullscreen button hidden on mobile - use browser's native fullscreen */
     .bottom-controls > .nav-btn:last-child {
-        position: absolute;
-        opacity: 0.3;
+        display: none;
     }
 }
 
