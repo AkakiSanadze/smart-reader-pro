@@ -428,19 +428,29 @@ const UI = {
     loadSettings() {
         const theme = Storage.get('theme', '');
         document.body.className = theme;
-        document.getElementById('theme-select').value = theme;
+        
+        const themeSelect = document.getElementById('theme-select');
+        if (themeSelect) themeSelect.value = theme;
 
         const rate = Storage.get('ttsRate', '1');
-        document.getElementById('rate-range').value = rate;
-        document.getElementById('speed-slider').value = rate;
-        document.getElementById('speed-val').textContent = rate + 'x';
+        const rateRange = document.getElementById('rate-range');
+        if (rateRange) rateRange.value = rate;
+        
+        const speedSlider = document.getElementById('speed-slider');
+        if (speedSlider) speedSlider.value = rate;
+        
+        const speedVal = document.getElementById('speed-val');
+        if (speedVal) speedVal.textContent = rate + 'x';
 
-        document.getElementById('volume-range').value = Storage.get('ttsVolume', '1');
-        document.getElementById('pitch-range').value = Storage.get('ttsPitch', '1');
+        const volumeRange = document.getElementById('volume-range');
+        if (volumeRange) volumeRange.value = Storage.get('ttsVolume', '1');
+        
+        const pitchRange = document.getElementById('pitch-range');
+        if (pitchRange) pitchRange.value = Storage.get('ttsPitch', '1');
 
-        // Load saved paragraph length preference
         const paraLength = Storage.get('paraLength', 'medium');
-        document.getElementById('para-length').value = paraLength;
+        const paraLengthEl = document.getElementById('para-length');
+        if (paraLengthEl) paraLengthEl.value = paraLength;
     },
 
     updateVoices() {
@@ -680,3 +690,347 @@ if ('serviceWorker' in navigator && window.location.protocol.startsWith('http'))
     .then((reg) => console.log('PWA Ready'))
     .catch((err) => console.log('PWA Offline mode not available on local file'));
 }
+
+// ==================== TOAST NOTIFICATION SYSTEM ====================
+const Toast = {
+    show(message, type = 'default', duration = 3000) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let icon = '';
+        if (type === 'success') {
+            icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else if (type === 'error') {
+            icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+        } else if (type === 'info') {
+            icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+        }
+        
+        toast.innerHTML = `${icon}<span>${message}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('hiding');
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    },
+    
+    success(message) { this.show(message, 'success'); },
+    error(message) { this.show(message, 'error'); },
+    info(message) { this.show(message, 'info'); }
+};
+
+// ==================== SWIPE GESTURES ====================
+const SwipeGestures = {
+    startX: 0,
+    startY: 0,
+    threshold: 50,
+    isSwiping: false,
+    
+    init(element) {
+        if (!element) return;
+        
+        element.addEventListener('touchstart', (e) => this.handleStart(e), { passive: true });
+        element.addEventListener('touchmove', (e) => this.handleMove(e), { passive: true });
+        element.addEventListener('touchend', (e) => this.handleEnd(e));
+        
+        // Mouse events for desktop testing
+        element.addEventListener('mousedown', (e) => this.handleStart(e));
+        element.addEventListener('mousemove', (e) => this.handleMove(e));
+        element.addEventListener('mouseup', (e) => this.handleEnd(e));
+        element.addEventListener('mouseleave', (e) => this.handleEnd(e));
+    },
+    
+    handleStart(e) {
+        const point = e.touches ? e.touches[0] : e;
+        this.startX = point.clientX;
+        this.startY = point.clientY;
+        this.isSwiping = true;
+    },
+    
+    handleMove(e) {
+        if (!this.isSwiping) return;
+        
+        const point = e.touches ? e.touches[0] : e;
+        const diffX = point.clientX - this.startX;
+        const diffY = point.clientY - this.startY;
+        
+        // Only horizontal swipe
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+            const container = document.querySelector('.slide-container');
+            if (container) {
+                container.classList.remove('swiping-left', 'swiping-right');
+                if (diffX < 0) {
+                    container.classList.add('swiping-left');
+                } else if (diffX > 0) {
+                    container.classList.add('swiping-right');
+                }
+            }
+        }
+    },
+    
+    handleEnd(e) {
+        if (!this.isSwiping) return;
+        
+        const point = e.changedTouches ? e.changedTouches[0] : e;
+        const diffX = point.clientX - this.startX;
+        const diffY = point.clientY - this.startY;
+        
+        const container = document.querySelector('.slide-container');
+        if (container) {
+            container.classList.remove('swiping-left', 'swiping-right');
+        }
+        
+        // Only trigger if horizontal movement is dominant
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
+            if (diffX < 0) {
+                // Swipe left - next slide
+                nextSlide();
+            } else {
+                // Swipe right - previous slide
+                prevSlide();
+            }
+        }
+        
+        this.isSwiping = false;
+    }
+};
+
+// ==================== FOCUS MODE ====================
+let focusModeEnabled = false;
+
+function toggleFocusMode() {
+    focusModeEnabled = !focusModeEnabled;
+    document.body.classList.toggle('focus-mode', focusModeEnabled);
+    
+    const btn = document.getElementById('focus-mode-btn');
+    if (btn) {
+        btn.setAttribute('aria-pressed', focusModeEnabled);
+        const icon = btn.querySelector('use');
+        if (icon) {
+            icon.setAttribute('href', focusModeEnabled ? '#icon-focus-off' : '#icon-focus');
+        }
+    }
+    
+    // Show indicator briefly
+    showFocusIndicator(focusModeEnabled ? 'ფოკუს რეჟიმი ჩართულია' : 'ფოკუს რეჟიმი გამორთულია');
+    
+    // Save preference
+    localStorage.setItem('focusMode', focusModeEnabled);
+}
+
+function showFocusIndicator(message) {
+    let indicator = document.querySelector('.focus-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'focus-indicator';
+        document.body.appendChild(indicator);
+    }
+    
+    indicator.textContent = message;
+    indicator.classList.add('visible');
+    
+    setTimeout(() => {
+        indicator.classList.remove('visible');
+    }, 1500);
+}
+
+// ==================== PAGE TRANSITIONS ====================
+const PageTransitions = {
+    currentScreen: 'landing',
+    
+    toReader() {
+        const landing = document.getElementById('landing-screen');
+        const reader = document.getElementById('reader-screen');
+        
+        landing.classList.add('leaving');
+        
+        setTimeout(() => {
+            landing.classList.add('hidden');
+            landing.classList.remove('leaving');
+            reader.classList.remove('hidden');
+            reader.classList.add('entering');
+            
+            setTimeout(() => {
+                reader.classList.remove('entering');
+            }, 400);
+        }, 400);
+        
+        this.currentScreen = 'reader';
+    },
+    
+    toLanding() {
+        const landing = document.getElementById('landing-screen');
+        const reader = document.getElementById('reader-screen');
+        
+        reader.classList.add('leaving-back');
+        
+        setTimeout(() => {
+            reader.classList.add('hidden');
+            reader.classList.remove('leaving-back');
+            landing.classList.remove('hidden');
+            landing.classList.add('entering-back');
+            
+            setTimeout(() => {
+                landing.classList.remove('entering-back');
+            }, 400);
+        }, 400);
+        
+        this.currentScreen = 'landing';
+    }
+};
+
+// ==================== KEYBOARD SHORTCUTS ====================
+document.addEventListener('keydown', (e) => {
+    // Only in reader mode
+    const readerScreen = document.getElementById('reader-screen');
+    if (readerScreen.classList.contains('hidden')) return;
+    
+    // Ignore if typing in input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    
+    switch (e.code) {
+        case 'Space':
+            e.preventDefault();
+            togglePlay();
+            break;
+        case 'ArrowLeft':
+            e.preventDefault();
+            prevSlide();
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            nextSlide();
+            break;
+        case 'Escape':
+            e.preventDefault();
+            exitReader();
+            break;
+        case 'KeyF':
+            if (!e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                toggleFocusMode();
+            }
+            break;
+        case 'KeyB':
+            if (!e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                toggleBookmark();
+            }
+            break;
+    }
+});
+
+// ==================== ENHANCED BOOKMARK ====================
+function updateBookmarkButton() {
+    const btn = document.getElementById('bookmark-btn');
+    if (!btn) return;
+    
+    const isBookmarked = AppState.bookmarkedSlides.has(AppState.currentIndex);
+    btn.classList.toggle('bookmarked', isBookmarked);
+    
+    const icon = btn.querySelector('use');
+    if (icon) {
+        icon.setAttribute('href', isBookmarked ? '#icon-bookmark-filled' : '#icon-bookmark');
+    }
+}
+
+// Override original toggleBookmark to update button
+const originalToggleBookmark = toggleBookmark;
+toggleBookmark = function() {
+    originalToggleBookmark();
+    updateBookmarkButton();
+    const isBookmarked = AppState.bookmarkedSlides.has(AppState.currentIndex);
+    Toast.show(isBookmarked ? 'სანიშნი დამატებულია' : 'სანიშნი მოცილებულია', 'info', 2000);
+};
+
+// ==================== ENHANCED STORAGE MANAGER ====================
+const originalSaveText = StorageManager.saveText.bind(StorageManager);
+StorageManager.saveText = function(text) {
+    if (!text) {
+        Toast.error('ტექსტი ცარიელია');
+        return;
+    }
+    originalSaveText(text);
+    Toast.success('ტექსტი შენახულია');
+};
+
+// ==================== INITIALIZATION ENHANCEMENT ====================
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize swipe gestures
+    const contentArea = document.getElementById('content-area');
+    if (contentArea) {
+        SwipeGestures.init(contentArea);
+    }
+    
+    // Restore focus mode preference
+    const savedFocusMode = localStorage.getItem('focusMode') === 'true';
+    if (savedFocusMode) {
+        focusModeEnabled = true;
+        document.body.classList.add('focus-mode');
+        const btn = document.getElementById('focus-mode-btn');
+        if (btn) {
+            const icon = btn.querySelector('use');
+            if (icon) icon.setAttribute('href', '#icon-focus-off');
+        }
+    }
+});
+
+// Override showScreen to use smooth transitions
+const _originalShowScreen = showScreen;
+showScreen = function(id) {
+    const landing = document.getElementById('landing-screen');
+    const reader = document.getElementById('reader-screen');
+    
+    if (id === 'reader-screen') {
+        landing.style.transition = 'opacity 0.25s ease';
+        landing.style.opacity = '0';
+        
+        setTimeout(() => {
+            landing.style.display = 'none';
+            reader.style.display = 'flex';
+            reader.style.opacity = '0';
+            reader.style.transform = 'translateX(30px)';
+            
+            requestAnimationFrame(() => {
+                reader.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                reader.style.opacity = '1';
+                reader.style.transform = 'translateX(0)';
+            });
+        }, 250);
+    } else {
+        reader.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        reader.style.opacity = '0';
+        reader.style.transform = 'translateX(-30px)';
+        
+        setTimeout(() => {
+            reader.style.display = 'none';
+            landing.style.display = 'block';
+            landing.style.opacity = '0';
+            
+            requestAnimationFrame(() => {
+                landing.style.transition = 'opacity 0.3s ease';
+                landing.style.opacity = '1';
+            });
+        }, 250);
+    }
+};
+
+// Override startReading to use Toast instead of alert
+const _originalStartReading = startReading;
+startReading = function() {
+    const text = document.getElementById('text-input').value.trim();
+    if (!text) {
+        Toast.error('გთხოვთ შეიყვანოთ ტექსტი');
+        return;
+    }
+    _originalStartReading();
+};
+
+// Export for global access
+window.Toast = Toast;
+window.toggleFocusMode = toggleFocusMode;
+window.loadDemo = loadDemo;
+window.clearInput = clearInput;
+window.pasteFromClipboard = pasteFromClipboard;

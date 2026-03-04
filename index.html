@@ -7,7 +7,6 @@
     <title>Smart Reader Pro</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script>
-        // Only load manifest on HTTP/HTTPS (not file://)
         if (window.location.protocol.startsWith('http')) {
             document.write('<link rel="manifest" href="manifest.json">');
         }
@@ -23,14 +22,103 @@
 </head>
 
 <body>
+    <!-- SVG Icon Sprite -->
+    <svg style="display: none;">
+        <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </symbol>
+        <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </symbol>
+        <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"></path>
+            <circle cx="12" cy="12" r="4"></circle>
+        </symbol>
+        <symbol id="icon-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </symbol>
+        <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </symbol>
+        <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+        </symbol>
+        <symbol id="icon-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"></circle>
+            <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"></circle>
+            <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"></circle>
+            <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"></circle>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
+        </symbol>
+        <symbol id="icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+        </symbol>
+        <symbol id="icon-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </symbol>
+        <symbol id="icon-bookmark-filled" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </symbol>
+        <symbol id="icon-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v4m0 12v4M2 12h4m12 0h4"></path>
+        </symbol>
+        <symbol id="icon-focus-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v4m0 12v4M2 12h4m12 0h4"></path>
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" opacity="0.5"></line>
+        </symbol>
+        <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </symbol>
+        <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+        </symbol>
+        <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+        </symbol>
+        <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </symbol>
+    </svg>
+
     <!-- ==================== LANDING SCREEN ==================== -->
-    <div id="landing-screen">
+    <div id="landing-screen" class="screen">
         <button class="settings-floating-btn" onclick="toggleSettings()" title="პარამეტრები" aria-label="პარამეტრები">
-            ⚙️
+            <svg class="icon"><use href="#icon-settings"></use></svg>
         </button>
         
         <div class="hero-section">
-            <span class="logo">📖</span>
+            <span class="logo">
+                <svg class="icon-logo"><use href="#icon-book"></use></svg>
+            </span>
             <h1>Smart Reader Pro</h1>
             <p class="subtitle">წაიკითხეთ და მოუსმინეთ ნებისმიერ ტექსტს სწრაფად და ეფექტურად.</p>
         </div>
@@ -40,15 +128,24 @@
                 <div class="section-header">
                     <h2 class="section-title">ახალი ტექსტი</h2>
                     <div class="quick-actions">
-                        <button class="quick-btn" onclick="loadDemo()" aria-label="დემო">✨ Demo</button>
-                        <button class="quick-btn" onclick="pasteFromClipboard()" aria-label="ჩასმა">📋 Paste</button>
-                        <button class="quick-btn" onclick="clearInput()" aria-label="გასუფთავება">🗑️ Clear</button>
+                        <button class="quick-btn" onclick="loadDemo()" aria-label="დემო">
+                            <svg class="icon-sm"><use href="#icon-sparkles"></use></svg>
+                            <span>Demo</span>
+                        </button>
+                        <button class="quick-btn" onclick="pasteFromClipboard()" aria-label="ჩასმა">
+                            <svg class="icon-sm"><use href="#icon-clipboard"></use></svg>
+                            <span>Paste</span>
+                        </button>
+                        <button class="quick-btn" onclick="clearInput()" aria-label="გასუფთავება">
+                            <svg class="icon-sm"><use href="#icon-trash"></use></svg>
+                            <span>Clear</span>
+                        </button>
                     </div>
                 </div>
                 <textarea id="text-input" placeholder="ჩასვით თქვენი ტექსტი აქ..."></textarea>
                 <button class="primary-btn" onclick="startReading()" aria-label="დაწყება">
                     <span>დაწყება</span> 
-                    <span style="font-size: 1.2rem">→</span>
+                    <svg class="icon"><use href="#icon-arrow-right"></use></svg>
                 </button>
             </div>
 
@@ -69,9 +166,7 @@
 
                 <div class="saved-texts-card" style="margin-top: 1.5rem">
                     <h3 class="section-title" style="margin-bottom: 1rem">ბოლო ტექსტები</h3>
-                    <div id="saved-texts-list">
-                        <!-- Items will be injected here -->
-                    </div>
+                    <div id="saved-texts-list"></div>
                     <div class="view-all-link" onclick="showAllSavedTexts()">ყველას ნახვა</div>
                 </div>
             </div>
@@ -79,19 +174,25 @@
     </div>
 
     <!-- ==================== READER SCREEN ==================== -->
-    <div id="reader-screen">
+    <div id="reader-screen" class="screen">
         <div class="top-nav">
             <div class="nav-left">
-                <button class="icon-btn" onclick="exitReader()" aria-label="მთავარი">🏠</button>
-                <button class="icon-btn" onclick="saveCurrentText()" aria-label="შენახვა">💾</button>
-                <button class="icon-btn" onclick="clearAndExit()" aria-label="გასუფთავება">🗑️</button>
+                <button class="icon-btn" onclick="exitReader()" aria-label="მთავარი">
+                    <svg class="icon"><use href="#icon-home"></use></svg>
+                </button>
+                <button class="icon-btn" onclick="saveCurrentText()" aria-label="შენახვა">
+                    <svg class="icon"><use href="#icon-save"></use></svg>
+                </button>
+                <button class="icon-btn" onclick="clearAndExit()" aria-label="გასუფთავება">
+                    <svg class="icon"><use href="#icon-trash"></use></svg>
+                </button>
             </div>
 
             <div class="nav-right">
                 <div id="current-voice-display" class="voice-badge" style="display:none"></div>
                 
                 <div class="control-group">
-                    <span>🎨</span>
+                    <svg class="icon-xs"><use href="#icon-palette"></use></svg>
                     <select id="theme-select" onchange="setTheme(this.value)" aria-label="თემა">
                         <option value="">ღია</option>
                         <option value="dark">მუქი</option>
@@ -100,7 +201,7 @@
                 </div>
 
                 <div class="control-group">
-                    <span>🗣️</span>
+                    <svg class="icon-xs"><use href="#icon-mic"></use></svg>
                     <select id="voice-select" onchange="updateVoicePreference()" aria-label="ხმა"></select>
                 </div>
 
@@ -108,19 +209,18 @@
                     <span>⚡</span>
                     <input type="range" id="speed-slider" min="0.5" max="3" step="0.1" value="1" oninput="updateSpeedSlider(this.value)" aria-label="სიჩქარე">
                     <span id="speed-val" style="font-size: 0.8rem; font-weight: 600; min-width: 24px;">1x</span>
+                    <!-- Hidden inputs for TTS values -->
                     <input type="hidden" id="rate-range" value="1">
+                    <input type="hidden" id="volume-range" value="1">
+                    <input type="hidden" id="pitch-range" value="1">
                 </div>
-
-                <!-- Hidden inputs for logic compatibility, controlled via Settings Panel -->
-                <input type="hidden" id="volume-range" value="1">
-                <input type="hidden" id="pitch-range" value="1">
-
-                <button class="icon-btn" onclick="toggleSettings()" aria-label="პარამეტრები">⚙️</button>
             </div>
         </div>
 
-        <div class="content-area">
-            <div id="slide-text">ტექსტი იტვირთება...</div>
+        <div class="content-area" id="content-area">
+            <div class="slide-container">
+                <p id="slide-text"></p>
+            </div>
         </div>
 
         <div class="bottom-controls">
@@ -140,12 +240,18 @@
             <div class="progress-container">
                 <div class="progress-text">
                     <span id="counter">0 / 0</span>
-                    <button class="icon-btn" style="width: auto; height: auto; font-size: 1rem;" onclick="toggleBookmark()" id="bookmark-btn">🏷️</button>
+                    <button class="icon-btn icon-btn-text" onclick="toggleBookmark()" id="bookmark-btn" aria-label="სანიშნი">
+                        <svg class="icon"><use href="#icon-bookmark"></use></svg>
+                    </button>
                 </div>
                 <div class="progress-bar" id="progress-bar" onclick="seekToPosition(event)">
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
             </div>
+
+            <button class="nav-btn" onclick="toggleFocusMode()" id="focus-mode-btn" aria-label="ფოკუს რეჟიმი">
+                <svg class="icon"><use href="#icon-focus"></use></svg>
+            </button>
 
             <button class="nav-btn" onclick="toggleFullScreen()" aria-label="სრული ეკრანი">
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
@@ -157,7 +263,9 @@
     <div class="settings-panel" id="settings-panel">
         <div class="settings-header">
             <h3>პარამეტრები</h3>
-            <button class="icon-btn" onclick="toggleSettings()">✕</button>
+            <button class="icon-btn" onclick="toggleSettings()">
+                <svg class="icon"><use href="#icon-x"></use></svg>
+            </button>
         </div>
 
         <div class="setting-item">
@@ -175,7 +283,7 @@
             <label class="setting-label">შრიფტის ტიპი</label>
             <select class="setting-control" onchange="setFontFamily(this.value)">
                 <option value="sans">Sans-serif (თანამედროვე)</option>
-                <option value="serif">Serif (წიგნისებული)</option>
+                <option value="serif">Serif (წიგნისებური)</option>
             </select>
         </div>
 
@@ -216,13 +324,22 @@
         <div class="setting-divider"></div>
 
         <div class="setting-item">
-            <button class="primary-btn secondary-btn" onclick="exportData()">📤 მონაცემების ექსპორტი</button>
-            <button class="primary-btn secondary-btn" onclick="document.getElementById('import-file').click()">📥 მონაცემების იმპორტი</button>
+            <button class="primary-btn secondary-btn" onclick="exportData()">
+                <svg class="icon-sm"><use href="#icon-upload"></use></svg>
+                <span>მონაცემების ექსპორტი</span>
+            </button>
+            <button class="primary-btn secondary-btn" onclick="document.getElementById('import-file').click()">
+                <svg class="icon-sm"><use href="#icon-download"></use></svg>
+                <span>მონაცემების იმპორტი</span>
+            </button>
             <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
         </div>
 
         <div class="setting-item">
-            <button class="primary-btn danger-btn" onclick="factoryReset()">⚠️ მონაცემების წაშლა</button>
+            <button class="primary-btn danger-btn" onclick="factoryReset()">
+                <svg class="icon-sm"><use href="#icon-alert"></use></svg>
+                <span>მონაცემების წაშლა</span>
+            </button>
         </div>
     </div>
 
@@ -231,12 +348,17 @@
         <div class="modal-content" id="modal-content" onclick="event.stopPropagation()">
             <div class="settings-header" style="margin-bottom: 1rem">
                 <h3 id="modal-title">სათაური</h3>
-                <button class="icon-btn" onclick="closeModal()">✕</button>
+                <button class="icon-btn" onclick="closeModal()">
+                    <svg class="icon"><use href="#icon-x"></use></svg>
+                </button>
             </div>
             <div id="modal-body"></div>
             <div id="modal-footer" style="margin-top: 1.5rem; text-align: right;"></div>
         </div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
     <script src="georgian-tts.js"></script>
     <script src="script.js"></script>
