@@ -1,7 +1,7 @@
 {
   "name": "Smart Reader Pro",
   "short_name": "Smart Reader",
-  "description": "ინტერაქტიური ტექსტის წამკითხველი აპლიკაცია",
+  "description": "ინტერაქტიული ტექსტის წამკითხველი აპლიკაცია",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#4f46e5",
@@ -9,7 +9,7 @@
   "orientation": "any",
   "scope": "/",
   "lang": "ka",
-  "categories": "education, utilities",
+  "categories": ["education", "utilities"],
   "icons": [
     {
       "src": "favicon.svg",
